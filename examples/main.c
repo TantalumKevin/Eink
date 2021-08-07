@@ -94,7 +94,7 @@ UBYTE Display_ColorPalette_Example(UWORD Panel_Width, UWORD Panel_Height, UDOUBL
     return 0;
 }
 
-UBYTE Display_BMP_Example(UWORD Panel_Width, UWORD Panel_Height, UDOUBLE Init_Target_Memory_Addr, UBYTE BitsPerPixel){
+UBYTE Display_BMP_Example(UWORD Panel_Width, UWORD Panel_Height, UDOUBLE Init_Target_Memory_Addr, UBYTE BitsPerPixel,int name){
     
     clock_t start, finish;
     double duration;
@@ -128,7 +128,7 @@ UBYTE Display_BMP_Example(UWORD Panel_Width, UWORD Panel_Height, UDOUBLE Init_Ta
    
     //1.5s
     char Path[30];
-    sprintf(Path,"./pic/%dx%d_4.bmp", WIDTH, HEIGHT);
+    sprintf(Path,"./pic/%dx%d_%d.bmp", WIDTH, HEIGHT,name);
 
     GUI_ReadBmp(Path, 0, 0);
 
@@ -136,24 +136,20 @@ UBYTE Display_BMP_Example(UWORD Panel_Width, UWORD Panel_Height, UDOUBLE Init_Ta
     //Paint_DrawRectangle(50, 50, WIDTH/2, HEIGHT/2, 0x30, DOT_PIXEL_3X3, DRAW_FILL_EMPTY);
     //Paint_DrawCircle(WIDTH*3/4, HEIGHT/4, 100, 0xF0, DOT_PIXEL_2X2, DRAW_FILL_EMPTY);
     //Paint_DrawNum(WIDTH/4, HEIGHT/5, 709, &Font20, 0x30, 0xB0);
-    finish = clock();
+    /*finish = clock();
     duration = (double)(finish - start) / CLOCKS_PER_SEC;
     Debug( "Total occupy %f second\n", duration );
 
     //DEV_Delay_ms(5000);
 
-    start = clock();
+    start = clock();*/
 
     //1.1s 2.0s 4.0s
     switch(BitsPerPixel){
-        case BitsPerPixel_8:{
+       
+       case BitsPerPixel_1:{
            //Paint_DrawString_CN(10, 10, "你好微软", &Font24CN, 0xF0, 0x00);
-            EPD_IT8951_8bp_Refresh(Refresh_Frame_Buf, 0, 0, WIDTH,  HEIGHT, false, Init_Target_Memory_Addr);
-            break;
-        }
-        case BitsPerPixel_4:{
-            //Paint_DrawString_CN(100, 100, "你好微软", &Font24CN, 0xF0, 0x00);
-            EPD_IT8951_4bp_Refresh(Refresh_Frame_Buf, 0, 0, WIDTH,  HEIGHT, false, Init_Target_Memory_Addr,false);
+            EPD_IT8951_1bp_Refresh(Refresh_Frame_Buf, 0, 0, WIDTH,  HEIGHT, A2_Mode, Init_Target_Memory_Addr,false);
             break;
         }
         case BitsPerPixel_2:{
@@ -161,9 +157,9 @@ UBYTE Display_BMP_Example(UWORD Panel_Width, UWORD Panel_Height, UDOUBLE Init_Ta
             EPD_IT8951_2bp_Refresh(Refresh_Frame_Buf, 0, 0, WIDTH,  HEIGHT, false, Init_Target_Memory_Addr,false);
             break;
         }
-        case BitsPerPixel_1:{
-           //Paint_DrawString_CN(10, 10, "你好微软", &Font24CN, 0xF0, 0x00);
-            EPD_IT8951_1bp_Refresh(Refresh_Frame_Buf, 0, 0, WIDTH,  HEIGHT, A2_Mode, Init_Target_Memory_Addr,false);
+        case BitsPerPixel_4:{
+            //Paint_DrawString_CN(100, 100, "你好微软", &Font24CN, 0xF0, 0x00);
+            EPD_IT8951_4bp_Refresh(Refresh_Frame_Buf, 0, 0, WIDTH,  HEIGHT, false, Init_Target_Memory_Addr,false);
             break;
         }
     }
@@ -211,9 +207,9 @@ void My_init(char *vocm,char *epd){
     EPD_IT8951_Clear_Refresh(Dev_Info, Init_Target_Memory_Addr, INIT_Mode);*/
 }
 
-void My_print(int mode){
+void My_print(int mode,int name){
 
-    Display_BMP_Example(Panel_Width, Panel_Height, Init_Target_Memory_Addr, mode);
+    Display_BMP_Example(Panel_Width, Panel_Height, Init_Target_Memory_Addr, mode,name);
     
 }
 
@@ -229,22 +225,22 @@ int main(int argc, char *argv[])
 
     My_init(argv[1],argv[2]);
 
-    My_print(1);   
+    for(int zjc=0;zjc<10;zjc++)My_print(1,zjc);   
         
     //EPD_IT8951_Clear_Refresh(Dev_Info, Init_Target_Memory_Addr, INIT_Mode);
     
-    My_print(1);
+    //My_print(1,5);
 
     //EPD_IT8951_Clear_Refresh(Dev_Info, Init_Target_Memory_Addr, INIT_Mode);
 
-    My_print(1);   
+    //My_print(1);   
         
     //EPD_IT8951_Clear_Refresh(Dev_Info, Init_Target_Memory_Addr, INIT_Mode);
 
-    My_print(1);
-    My_print(1);
+    //My_print(1);
+    //My_print(1);
 
-    EPD_IT8951_Clear_Refresh(Dev_Info, Init_Target_Memory_Addr, INIT_Mode);
+    //EPD_IT8951_Clear_Refresh(Dev_Info, Init_Target_Memory_Addr, INIT_Mode);
     //EPD_IT8951_Sleep();
     //EPD_IT8951_Standby();
     //DEV_Delay_ms(5000);

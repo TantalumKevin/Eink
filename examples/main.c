@@ -51,7 +51,6 @@ static void Epd_Mode(int mode)
     }
 }
 
-
 UBYTE Display_ColorPalette_Example(UWORD Panel_Width, UWORD Panel_Height, UDOUBLE Init_Target_Memory_Addr){
     UWORD In_4bp_Refresh_Area_Width;
     if(Four_Byte_Align == true){
@@ -77,9 +76,10 @@ UBYTE Display_ColorPalette_Example(UWORD Panel_Width, UWORD Panel_Height, UDOUBL
     In_4bp_Refresh_Start = clock();
 
     UBYTE SixteenColorPattern[16] = {0xFF,0xEE,0xDD,0xCC,0xBB,0xAA,0x99,0x88,0x77,0x66,0x55,0x44,0x33,0x22,0x11,0x00};
-
+    //UBYTE SixteenColorPattern[16] = {0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
     for(int i=0; i < 16; i++){
         memset(Refresh_Frame_Buf, SixteenColorPattern[i], Imagesize);
+        //EPD_IT8951_1bp_Refresh(Refresh_Frame_Buf, 0, i * In_4bp_Refresh_Area_Height, In_4bp_Refresh_Area_Width, In_4bp_Refresh_Area_Height, A2_Mode, Init_Target_Memory_Addr,false);
         EPD_IT8951_4bp_Refresh(Refresh_Frame_Buf, 0, i * In_4bp_Refresh_Area_Height, In_4bp_Refresh_Area_Width, In_4bp_Refresh_Area_Height, false, Init_Target_Memory_Addr, false);
     }
 
@@ -100,84 +100,95 @@ UBYTE Display_BMP_Example(UWORD Panel_Width, UWORD Panel_Height, UDOUBLE Init_Ta
     double duration;
 
     start = clock();
-    
-    UWORD WIDTH;
+    UWORD WIDTH=720,HEIGHT=720;
+/*
     if(Four_Byte_Align == true){
         WIDTH  = Panel_Width - (Panel_Width % 32);
     }else{
         WIDTH = Panel_Width;
     }
     UWORD HEIGHT = Panel_Height;
-
+*/
     UDOUBLE Imagesize;
-
+    char Path[30];
     Imagesize = ((WIDTH * BitsPerPixel % 8 == 0)? (WIDTH * BitsPerPixel / 8 ): (WIDTH * BitsPerPixel / 8 + 1)) * HEIGHT;
-    if((Refresh_Frame_Buf = (UBYTE *)malloc(Imagesize)) == NULL) {
-        Debug("Failed to apply for black memory...\r\n");
-        return -1;
-    }
-   
-
+    Refresh_Frame_Buf = (UBYTE *)malloc(Imagesize);
     Paint_NewImage(Refresh_Frame_Buf, WIDTH, HEIGHT, 0, BLACK);
     Paint_SelectImage(Refresh_Frame_Buf);
     Epd_Mode(epd_mode);
     Paint_SetBitsPerPixel(BitsPerPixel);
     Paint_Clear(WHITE);
-
-
-   
-    //1.5s
-    char Path[30];
-    sprintf(Path,"./pic/%dx%d_%d.bmp", WIDTH, HEIGHT,name);
-
-    GUI_ReadBmp(Path, 0, 0);
-
-    //you can draw your character and pattern on the image, for color definition of all BitsPerPixel, you can refer to GUI_Paint.h, 
-    //Paint_DrawRectangle(50, 50, WIDTH/2, HEIGHT/2, 0x30, DOT_PIXEL_3X3, DRAW_FILL_EMPTY);
-    //Paint_DrawCircle(WIDTH*3/4, HEIGHT/4, 100, 0xF0, DOT_PIXEL_2X2, DRAW_FILL_EMPTY);
-    //Paint_DrawNum(WIDTH/4, HEIGHT/5, 709, &Font20, 0x30, 0xB0);
-    /*finish = clock();
-    duration = (double)(finish - start) / CLOCKS_PER_SEC;
-    Debug( "Total occupy %f second\n", duration );
-
-    //DEV_Delay_ms(5000);
-
-    start = clock();*/
-
-    //1.1s 2.0s 4.0s
-    switch(BitsPerPixel){
+    //Paint_DrawString_EN(0, 0, "Hello World", &Font24, 0x00, 0xFF);
+    int na=name;
+    for(name=0;name<10;name++)
+    {
+    sprintf(Path,"./pic/1872x1404_1_%d.bmp",name);
+    for(int nm=0;nm<10;nm++)GUI_ReadBmp(Path, name*72, nm*72);
+    }
+            //for(int aaa=0;aaa<10;aaa++){
+switch(BitsPerPixel){
        
        case BitsPerPixel_1:{
-           //Paint_DrawString_CN(10, 10, "你好微软", &Font24CN, 0xF0, 0x00);
-            EPD_IT8951_1bp_Refresh(Refresh_Frame_Buf, 0, 0, WIDTH,  HEIGHT, A2_Mode, Init_Target_Memory_Addr,false);
+            //EPD_IT8951_1bp_Refresh(Refresh_Frame_Buf, 0+aaa*72, 0, 72, HEIGHT,  A2_Mode, Init_Target_Memory_Addr,false);
+            EPD_IT8951_1bp_Refresh(Refresh_Frame_Buf, 0,0, 720,720,  A2_Mode, Init_Target_Memory_Addr,false);
+            //EPD_IT8951_1bp_Refresh(Refresh_Frame_Buf, 0,1200, WIDTH, 204,  A2_Mode, Init_Target_Memory_Addr,false);
             break;
         }
         case BitsPerPixel_2:{
-           // Paint_DrawString_CN(10, 10, "你好微软", &Font24CN, 0xF0, 0x00);
-            EPD_IT8951_2bp_Refresh(Refresh_Frame_Buf, 0, 0, WIDTH,  HEIGHT, false, Init_Target_Memory_Addr,false);
+            //EPD_IT8951_4bp_Refresh(Refresh_Frame_Buf, 0+aaa*72, 0, 72, HEIGHT, false, Init_Target_Memory_Addr,false);
+            EPD_IT8951_2bp_Refresh(Refresh_Frame_Buf, 0, 0, 720, 720, false, Init_Target_Memory_Addr,false);
+            //EPD_IT8951_2bp_Refresh(Refresh_Frame_Buf, 0, 1200, WIDTH,  204, false, Init_Target_Memory_Addr,false);
             break;
         }
         case BitsPerPixel_4:{
-            //Paint_DrawString_CN(100, 100, "你好微软", &Font24CN, 0xF0, 0x00);
-            EPD_IT8951_4bp_Refresh(Refresh_Frame_Buf, 0, 0, WIDTH,  HEIGHT, false, Init_Target_Memory_Addr,false);
+            //EPD_IT8951_4bp_Refresh(Refresh_Frame_Buf, 0+aaa*72, 0, 72, HEIGHT,  false, Init_Target_Memory_Addr,false);
+            EPD_IT8951_4bp_Refresh(Refresh_Frame_Buf, 0, 0, 720, 720, false, Init_Target_Memory_Addr,false);
+            //EPD_IT8951_4bp_Refresh(Refresh_Frame_Buf, 0, 1200, WIDTH,  204, false, Init_Target_Memory_Addr,false);
             break;
         }
-    }
-    
+    }//}
 
-    //start = clock();
+
+/*
+    UDOUBLE Basical_Memory_Addr = Init_Target_Memory_Addr;
+    UDOUBLE Target_Memory_Addr = Basical_Memory_Addr;
+    for(int i=0; i < 10; i += 1){
+        Paint_Clear(WHITE);
+        sprintf(Path,"./pic/1872x1404_1_%d.bmp",i);
+        GUI_ReadBmp(Path, 0, 0);
+        //For color definition of all BitsPerPixel, you can refer to GUI_Paint.h
+        //Paint_DrawNum(10, 10, i+1, &Font16, 0x00, 0xF0);
+        //EPD_IT8951_Multi_Frame_Write(Refresh_Frame_Buf, 0+i*72,0+BitsPerPixel*72, 72,  72, Init_Target_Memory_Addr,false,BitsPerPixel);
+        EPD_IT8951_Multi_Frame_Write(Refresh_Frame_Buf, 600+i*72,600+BitsPerPixel*72, 72,  72, Target_Memory_Addr,false,BitsPerPixel);
+        EPD_IT8951_Multi_Frame_Write(Refresh_Frame_Buf, 600+i*72,816+BitsPerPixel*72, 72,  72, Target_Memory_Addr,false,BitsPerPixel);
+
+        //EPD_IT8951_1bp_Multi_Frame_Write(Refresh_Frame_Buf, 600+i*72,600+BitsPerPixel*72, 72,  72, Target_Memory_Addr,false);
+        Target_Memory_Addr += Imagesize;
+    }
+
+    finish = clock();
+    duration = (double)(finish - start) / CLOCKS_PER_SEC;
+    Debug( "Write occupy %f second\n", duration );
+
+    start = clock();
+
+    Target_Memory_Addr = Basical_Memory_Addr;
+
+    for(int i=0; i< 10; i += 1){
+        EPD_IT8951_Multi_Frame_Refresh(600+i*72,600+BitsPerPixel*72, 72,  72, Target_Memory_Addr);
+        //EPD_IT8951_1bp_Multi_Frame_Refresh(600+i*72,600+BitsPerPixel*72, 72,  72, Target_Memory_Addr);
+        Target_Memory_Addr += Imagesize;
+    }   
+*/
+
 
     if(Refresh_Frame_Buf != NULL){
         free(Refresh_Frame_Buf);
         Refresh_Frame_Buf = NULL;
     }
-    
     finish = clock();
     duration = (double)(finish - start) / CLOCKS_PER_SEC;
-    Debug( "Total occupy %f second\n", duration );
-
-    //DEV_Delay_ms(5000);
-
+    Debug( "Show occupy %f second\n", duration );
     return 0;
 }
 
@@ -215,7 +226,7 @@ void My_print(int mode,int name){
 
 void My_exit(){
 
-    EPD_IT8951_Clear_Refresh(Dev_Info, Init_Target_Memory_Addr, INIT_Mode);
+    //EPD_IT8951_Clear_Refresh(Dev_Info, Init_Target_Memory_Addr, GC16_Mode);
     DEV_Module_Exit();
 }
 
@@ -225,9 +236,30 @@ int main(int argc, char *argv[])
 
     My_init(argv[1],argv[2]);
 
-    for(int zjc=0;zjc<10;zjc++)My_print(1,zjc);   
-        
-    //EPD_IT8951_Clear_Refresh(Dev_Info, Init_Target_Memory_Addr, INIT_Mode);
+    for(int zjc=0;zjc<10;zjc++){
+        //My_print(1,zjc);//0.14spc:72*72,0.17spc:720*72,0.54spc:720*720
+        //DEV_Delay_ms(5000);
+        My_print(2,zjc);//0.46spc:72*72,0.50spc:720*72,0.54spc:720*720
+        DEV_Delay_ms(5000);
+        My_print(4,zjc);//0.47spc:72*72,0.52spc:720*72,0.83spc:720*720
+        DEV_Delay_ms(5000);
+    }
+    //My_print(1,0);
+    //Total:4.8s
+    //Write:0.5s
+    //Show:4.3s
+    //My_print(2,0);
+    //Total:4.8s
+    //Write:0.5s
+    //Show:4.3s
+    //My_print(4,0);
+    //Total:5.3s
+    //Write:1.0s
+    //Show:4.3s
+    
+   
+        //Display_ColorPalette_Example(Panel_Width, Panel_Height, Init_Target_Memory_Addr);
+    //EPD_IT8951_Clear_Refresh(Dev_Info, Init_Target_Memory_Addr, );
     
     //My_print(1,5);
 
@@ -240,7 +272,7 @@ int main(int argc, char *argv[])
     //My_print(1);
     //My_print(1);
 
-    //EPD_IT8951_Clear_Refresh(Dev_Info, Init_Target_Memory_Addr, INIT_Mode);
+    EPD_IT8951_Clear_Refresh(Dev_Info, Init_Target_Memory_Addr, INIT_Mode);
     //EPD_IT8951_Sleep();
     //EPD_IT8951_Standby();
     //DEV_Delay_ms(5000);

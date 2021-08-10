@@ -1,4 +1,0 @@
-cd IT8951
-sudo make clean
-sudo make -j4
-sudo ./epd -1.27 0
